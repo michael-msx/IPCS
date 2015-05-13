@@ -1,5 +1,6 @@
 package com.ipcs.controller;
 
+import com.ipcs.controller.validator.ActivityValidator;
 import com.ipcs.controller.validator.PersonValidator;
 import com.ipcs.model.*;
 import com.ipcs.service.AdminService;
@@ -47,30 +48,43 @@ public class AdminController {
     }
 
 
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
+    @InitBinder("command")
+    public void initBinderForChild(WebDataBinder binder) {
         SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
         sdf.setLenient(false);
         binder.registerCustomEditor(Date.class, new CustomDateEditor(sdf, true));
         binder.setValidator(new PersonValidator());
     }
 
+    @InitBinder("activity")
+    public void initBinderForActivity(WebDataBinder binder) {
+        SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
+        sdf.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(sdf, true));
+        binder.setValidator(new ActivityValidator());
+    }
+
+
     @RequestMapping(value = "/addChildren", method = RequestMethod.GET)
     public ModelAndView student(@RequestParam Map<String,String> requestParams) {
         String account_name = requestParams.get("account_name");
         if(null!=account_name){
             Person child = adminservice.getChildDetail(account_name);
-            return new ModelAndView("addChildren", "command", child);
+            return new ModelAndView("addChildren", "command", child).addObject("operation","update");
         }
         else
-            return new ModelAndView("addChildren", "command", new Person());
+            return new ModelAndView("addChildren", "command", new Person()).addObject("operation","add");
     }
 
 
     @RequestMapping(value = "/persistChild", method = RequestMethod.POST)
-    public String persistStudent(@ModelAttribute("command") @Validated Person child, BindingResult bindingResult, HttpSession session,ModelMap model) throws ParseException {
+    public String persistStudent(@ModelAttribute("command") @Validated Person child, BindingResult bindingResult, HttpSession session,@RequestParam Map<String,String> requestParams) throws ParseException {
         if(bindingResult.hasErrors())
             return "addChildren";
+        if("update".equals(requestParams.get("operation"))) {
+            adminservice.updatePerson(child);
+            return "navigator";
+        }
         School school = ((Person) session.getAttribute("authenticatedAdmin")).getSchools().iterator().next();
         child.setAccount_name(child.getPersonDetail().getFirstName()+child.getPersonDetail().getLastName());
         child.setPassword_hash("11");
@@ -88,17 +102,21 @@ public class AdminController {
         String account_name = requestParams.get("account_name");
         if(null!=account_name){
             Person staff = adminservice.getChildDetail(account_name);
-            return new ModelAndView("addStaff", "command", staff);
+            return new ModelAndView("addStaff", "command", staff).addObject("operation","update");
         }
         else
-            return new ModelAndView("addStaff", "command", new Person());
+            return new ModelAndView("addStaff", "command", new Person()).addObject("operation","add");
     }
 
 
     @RequestMapping(value = "/persistStaff", method = RequestMethod.POST)
-    public String persistStaff(@ModelAttribute("command") @Validated Person staff, BindingResult bindingResult, HttpSession session,ModelMap model) throws ParseException {
+    public String persistStaff(@ModelAttribute("command") @Validated Person staff, BindingResult bindingResult, HttpSession session,ModelMap model,@RequestParam Map<String,String> requestParams) throws ParseException {
         if(bindingResult.hasErrors())
             return "addStaff";
+        if("update".equals(requestParams.get("operation"))) {
+            adminservice.updatePerson(staff);
+            return "navigator";
+        }
         School school = ((Person) session.getAttribute("authenticatedAdmin")).getSchools().iterator().next();
         staff.setAccount_name(staff.getPersonDetail().getFirstName()+staff.getPersonDetail().getLastName());
         staff.setPassword_hash("11");
@@ -121,5 +139,38 @@ public class AdminController {
         List<Person> staffs = adminservice.listAllPersonByRoleName(school.getName(), "STAFF");
         return new ModelAndView("listStaff", "command", staffs);
     }
+
+    @RequestMapping(value = "/listActivity", method = RequestMethod.GET)
+    public ModelAndView listActivity(HttpSession session) {
+        Person person = (Person) session.getAttribute("authenticatedAdmin");
+        List<Activity> activities =adminservice.listAllActivitiesFromAdmin(person.getAccount_name());
+        return new ModelAndView("listActivities", "command", activities);
+    }
+
+    @RequestMapping(value = "/addActivity", method = RequestMethod.GET)
+    public ModelAndView addActivity(@RequestParam Map<String,String> requestParams) {
+        String activityId = requestParams.get("activityId");
+        if(null!=activityId){
+            Activity activity = adminservice.getActivityDetail(Long.parseLong(activityId));
+            return new ModelAndView("addActivity", "activity", activity).addObject("operation","update");
+        }
+        else
+            return new ModelAndView("addActivity", "activity", new Activity()).addObject("operation","add");
+    }
+
+    @RequestMapping(value = "/persistActivity", method = RequestMethod.POST)
+    public ModelAndView persistActivity(@ModelAttribute("activity")  @Validated Activity activity, BindingResult bindingResult, HttpSession session,ModelMap model,@RequestParam Map<String,String> requestParams) throws ParseException {
+        School school = ((Person) session.getAttribute("authenticatedAdmin")).getSchools().iterator().next();
+        if(bindingResult.hasErrors())
+            return  new ModelAndView("addActivity", "operation", "add");
+        activity.setSchool(school);
+        if("update".equals(requestParams.get("operation"))) {
+//            adminservice.
+            return new ModelAndView("navigator");
+        }
+        adminservice.addActivity(activity);
+        return new ModelAndView("navigator");
+    }
+
 
 }

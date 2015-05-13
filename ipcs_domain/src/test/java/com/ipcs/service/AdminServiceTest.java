@@ -13,8 +13,8 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,7 +65,7 @@ public class AdminServiceTest {
     @Test(dependsOnMethods = {"insertStudents"}, groups = "inserDummyData")
     public void testFindAllStudents() {
         List<Person> students = adminService.listAllPersonByRoleName("PUNGOL", "children");
-        Assert.assertEquals(students.size(), 4);
+        Assert.assertTrue(students.size() >= 4);
     }
 
     @Test(dependsOnMethods = {"testFindAllStudents"}, groups = "inserDummyData")
@@ -76,24 +76,47 @@ public class AdminServiceTest {
     }
 
 
-    @Test(groups = "queryActivities")
+    @Test(dependsOnMethods = {"testGetAdminInfo"}, groups = "query")
     public void testQueryActivies() {
         List<Activity> activities = adminService.listAllActivities(2l);
         Assert.assertEquals(activities.size(), 1);
         Assert.assertEquals(activities.iterator().next().getName(), "Math");
     }
-
-    @Test(groups = "queryChildrenDetail")
-    public void testQueryChildrenDetail() {
-       Person person = adminService.getChildDetail("admin");
-        Assert.assertEquals(person.getPersonDetail().getFirstName(), "DetailFirst");
-//        Assert.assertEquals(activities.iterator().next().getName(), "Math");
+    @Test(dependsOnMethods = {"testGetAdminInfo"}, groups = "query")
+    public void testQueryActiviesUnderAdmin() {
+        List<Activity> activities = adminService.listAllActivitiesFromAdmin("Person");
+        Assert.assertTrue(activities.size()>=1);
     }
+
+
+
+
+    @Test(dependsOnMethods = {"testGetAdminInfo"},groups = "query")
+    public void testQueryChildrenDetail() {
+        Person person = adminService.getChildDetail("admin");
+        Assert.assertEquals(person.getPersonDetail().getFirstName(), "DetailFirst");
+    }
+
+
+    @Test(dependsOnGroups = {"query"},groups = "update")
+    public void testUpdateUser() {
+        Person person = adminAndStudents.get(0);
+        person.setAccount_name("admin3");
+        adminService.updatePerson(person);
+
+    }
+
 
     @Test(groups = "listAllChild")
     public void tesListAllChild() {
         List<Person> activities = adminService.listAllChild(4l);
         Assert.assertEquals(activities.size(), 2);
+    }
+
+    @Test(dependsOnGroups = {"query"})
+    public void testAddActivityWithHost(){
+        Activity activity = new Activity.ActivityBuilder().withDescription("Physical").withStartDate(new Date()).withLocation("Shanghai").withHost(new Person("Person")).withName("Physical").withSchool(new School("PUNGOL")).builder();
+        adminService.addActivity(activity);
     }
 
 

@@ -33,7 +33,7 @@
             <column name="date_modified"/> 
         </property>
 
-        <many-to-one name="host" column="host" lazy="false"
+        <many-to-one name="host" column="host"
                      class="com.ipcs.model.Person"/>
 
 
@@ -41,6 +41,9 @@
             <key column="activity_fk" />
             <many-to-many class="com.ipcs.model.Person" column="person_fk" />
         </bag>
+
+        <many-to-one name="school" column="school_fk"
+                     class="com.ipcs.model.School"/>
 
     </class>
 </hibernate-mapping>

@@ -23,7 +23,7 @@
         </property>
 
 
-        <bag name="roles" table="person_role" lazy="false">
+        <bag name="roles" table="person_role" lazy="true">
             <key column="person_fk"/>
             <many-to-many class="com.ipcs.model.Role" column="role_fk"/>
         </bag>
@@ -39,18 +39,18 @@
         </bag>
 
 
-        <bag name="schools" table="person_school" lazy="false">
+        <bag name="schools" table="person_school" lazy="true">
             <key column="person_fk"/>
             <many-to-many class="com.ipcs.model.School" column="school_fk"/>
         </bag>
 
-        <bag name="contacts" cascade="all-delete-orphan" lazy="false">
+        <bag name="contacts" cascade="all-delete-orphan" lazy="true">
             <key column="person_fk"/>
             <one-to-many class="com.ipcs.model.Contact"/>
         </bag>
 
 
-        <many-to-one name="personDetail" column="person_detail_fk" lazy="false" unique="true" cascade="all-delete-orphan"
+        <many-to-one name="personDetail" column="person_detail_fk" unique="true" cascade="all-delete-orphan"
                      class="com.ipcs.model.PersonDetail"/>
     </class>
 </hibernate-mapping>

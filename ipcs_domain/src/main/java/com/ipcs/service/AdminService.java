@@ -22,6 +22,8 @@ public interface AdminService {
 	
 	void removePerson(Person person);
 
+	Person findPersonByName(String accountName);
+
 	List<Person> listAllPersonByRoleName(String schoolName, String roleName);
 	
 	void updatePerson(Person person);
@@ -45,4 +47,10 @@ public interface AdminService {
 	RelationshipType getRelationshipTypeByName(String name);
 
 	Person getChildDetail(String childName);
+
+	List<Activity> listAllActivitiesFromAdmin(String adminName);
+
+	void addActivity(Activity activity);
+
+	Activity getActivityDetail(Long activityId);
 }
