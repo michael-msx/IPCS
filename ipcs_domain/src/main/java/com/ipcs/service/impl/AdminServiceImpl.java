@@ -224,6 +224,35 @@ public class AdminServiceImpl implements AdminService {
         activityDao.save(activity);
     }
 
+    @Transactional
+    public void updateActivity(Activity activity){        {
+        Activity persistedActivity = activityDao.load(activity.getObjectId());
+        persistedActivity.setName(activity.getName());
+        persistedActivity.setDescription(activity.getDescription());
+        persistedActivity.setLocation(activity.getLocation());
+        persistedActivity.setStartTime(activity.getStartTime());
+
+        Person persistedHost = findPersonByName(activity.getHost().getAccount_name());
+        persistedActivity.setHost(persistedHost);
+
+        List<Person> trainsientPersons = new ArrayList<Person>();
+        trainsientPersons.addAll(activity.getPersons());
+        persistedActivity.getPersons().clear();;
+        for (Person person : trainsientPersons) {
+            person = findPersonByName(person.getAccount_name());
+            if (null != person)
+                persistedActivity.addPersonToList(person);
+        }
+            activityDao.update(persistedActivity);
+        }
+    }
+
+
+    @Transactional
+    public void deleteActivity(Long activtyId){
+        Activity activity = activityDao.get(activtyId);
+        activityDao.delete(activity);
+    }
 
     @Transactional
     public Activity getActivityDetail(Long activityId){
