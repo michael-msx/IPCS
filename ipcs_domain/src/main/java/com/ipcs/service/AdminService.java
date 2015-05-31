@@ -36,7 +36,7 @@ public interface AdminService {
 	
 	List<School> getSchoolByType(String type);
 
-	Person getAdminInfo(String adminName);
+	Person getPersonInfo(String name);
 	
 	List<Message> listAllMessages(String adminName);
 
@@ -46,8 +46,6 @@ public interface AdminService {
 
 	RelationshipType getRelationshipTypeByName(String name);
 
-	Person getChildDetail(String childName);
-
 	List<Activity> listAllActivitiesFromAdmin(String adminName);
 
 	void addActivity(Activity activity);
@@ -55,6 +53,8 @@ public interface AdminService {
 	void updateActivity(Activity activty);
 
 	void deleteActivity(Long activtyId);
+
+	void deletePerson(Long personId);
 
 	Activity getActivityDetail(Long activityId);
 }
