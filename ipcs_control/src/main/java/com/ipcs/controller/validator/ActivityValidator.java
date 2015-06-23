@@ -11,7 +11,6 @@ import org.springframework.validation.Validator;
 public class ActivityValidator implements Validator {
 
     public boolean supports(Class<?> clazz) {
-        // TODO Auto-generated method stub
         return Activity.class.equals(clazz);
     }
 
@@ -19,16 +18,19 @@ public class ActivityValidator implements Validator {
 
     @Override
     public void validate(Object obj, Errors errors) {
-        // TODO Auto-generated method stub
         Activity activity = (Activity) obj;
         if (null ==activity.getName()||"".equals(activity.getName()))
             errors.rejectValue("name", null, "Activity name not provided.");
-        if (null == activity.getHost().getAccount_name()||"".equals(activity.getHost().getAccount_name()))
+        if (null == activity.getHost()||"".equals(activity.getHost().getAccount_name()))
             errors.rejectValue("host.account_name", null, "Teacher name not provided.");
         if (null == activity.getLocation()||"".equals(activity.getLocation()))
             errors.rejectValue("location", null, "Location not provided.");
         if (null == activity.getStartTime()||"".equals(activity.getStartTime()))
-            errors.rejectValue("startTime", null, "StartTime not provided.");
-
+            errors.rejectValue("startTime", null, "Start time not provided.");
+        if (null == activity.getEndTime()||"".equals(activity.getEndTime()))
+            errors.rejectValue("endTime", null, "End time not provided.");
+        if (null != activity.getEndTime()&&null!=activity.getStartTime())
+            if((activity.getEndTime().compareTo(activity.getStartTime()))<0)
+                errors.rejectValue("startTime", null, "Start time  should earlier than end time.");
     }
 }

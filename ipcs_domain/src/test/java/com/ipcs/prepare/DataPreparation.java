@@ -32,7 +32,6 @@ public class DataPreparation {
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         statement.execute("delete from person_role;");
-        statement.execute("delete from person_school;");
         statement.execute("delete from role_permission;");
         statement.execute("delete from role;");
         statement.execute("delete from schedule;");
@@ -48,6 +47,7 @@ public class DataPreparation {
         statement.execute("delete from relationship_type;");
         statement.execute("delete from user_group;");
         statement.execute("delete from person_detail;");
+        statement.execute("delete from activity_type;");
         connection.close();
     }
 

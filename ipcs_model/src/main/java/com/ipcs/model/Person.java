@@ -29,7 +29,7 @@ public class Person extends BasicObject {
 
     private List<Relationship> relationships = new ArrayList<Relationship>();
 
-    private List<Activity> activities;
+    private List<Activity> activities = new ArrayList<Activity>();
 
     public Person(String name, String password) {
         super();
@@ -106,7 +106,10 @@ public class Person extends BasicObject {
         this.roles.add(role);
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "persons",cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "SCHEDULE", joinColumns = {
+            @JoinColumn(name = "PERSON_FK", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "ACTIVITY_FK")})
     public List<Activity> getActivities() {
         return activities;
     }
